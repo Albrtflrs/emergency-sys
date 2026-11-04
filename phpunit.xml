@@ -23,9 +23,15 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_DATABASE" value="emergency_sys_test"/>
         <env name="DB_URL" value=""/>
+        <env name="DB_USERNAME" value="mdrrmo_migrate"/>
+        <env name="DB_PASSWORD" value="MigrateDbPass!2026"/>
+        <env name="DB_AUDIT_USERNAME" value="mdrrmo_audit"/>
+        <env name="DB_AUDIT_PASSWORD" value="AuditDbPass!2026"/>
+        <env name="DB_MIGRATE_USERNAME" value="mdrrmo_migrate"/>
+        <env name="DB_MIGRATE_PASSWORD" value="MigrateDbPass!2026"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
