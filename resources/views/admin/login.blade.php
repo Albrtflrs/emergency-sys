@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     @vite('resources/css/app.css')
-    <script>document.documentElement.classList.toggle('dark', localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);</script>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased transition-colors duration-200 dark:bg-[#111315] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
+<body class="operations-surface min-h-screen bg-slate-50 text-slate-800 antialiased transition-colors duration-200 dark:bg-[#18181b] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
     <div class="app-photo-canvas flex min-h-screen items-center justify-center px-4 py-10">
-        <div class="grid w-full max-w-5xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 md:grid-cols-2 dark:border-slate-700 dark:bg-slate-900">
+        <div class="civic-panel grid w-full max-w-5xl overflow-hidden rounded-[6px] md:grid-cols-2 dark:border-slate-700 dark:bg-slate-900">
             <div class="bg-slate-100 p-8 text-slate-800 md:p-12 dark:bg-slate-800 dark:text-slate-100">
-                <div class="mb-7 flex h-16 w-16 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm dark:border-slate-600 dark:bg-slate-900">
-                    <img src="{{ asset('assets/kalibo-logo.png') }}" alt="Kalibo logo" class="h-12 w-12 object-contain" />
-                </div>
-                <p class="text-xs font-black uppercase tracking-[0.25em] text-blue-800 dark:text-blue-300">Administrator Portal</p>
+                <div class="mb-7"><span class="brand-marks brand-marks-login"><img class="brand-mark-sou" src="{{ asset('assets/sou.png') }}" alt="Special Operations Unit emblem" width="64" height="64"><img class="brand-mark-kalibo" src="{{ asset('assets/kalibo-logo.png') }}" alt="Municipality of Kalibo seal" width="44" height="44"></span></div>
+                <p class="text-xs font-black uppercase tracking-[0.18em] text-blue-800 dark:text-blue-300">Kalibo MDRRMO · SOU</p>
+                <p class="mt-2 text-sm font-bold text-slate-600 dark:text-slate-300">Special Operations Unit</p>
                 <h1 class="mt-6 text-3xl font-black tracking-tight text-slate-950 dark:text-white">Emergency operations access</h1>
                 <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">This area is restricted to authorized administrators. Please sign in with your administrator account.</p>
                 <div class="mt-8 space-y-4 text-sm text-slate-700 dark:text-slate-200">

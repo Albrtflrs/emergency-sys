@@ -6,23 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Incident Queue</title>
     @vite('resources/css/app.css')
-    <script>document.documentElement.classList.toggle('dark', localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);</script>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-[#111315] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
-    <div class="app-photo-canvas min-h-screen">
-        <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-            <header class="mb-6 flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-xs font-black uppercase tracking-[0.25em] text-blue-800 dark:text-blue-300">Admin panel</p>
-                    <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">Incident queue</h1>
-                    <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Update report status and priority, and message the reporter.</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-3">
-                    @include('components.theme-toggle', ['placement' => 'inline'])
-                    <a href="{{ route('admin.dashboard') }}" class="rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 hover:border-blue-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">Back to dashboard</a>
-                    <form method="POST" action="{{ route('admin.logout') }}">@csrf<button type="submit" class="rounded-full bg-blue-800 px-4 py-2 text-sm font-bold text-white hover:bg-blue-900 dark:bg-blue-400 dark:text-slate-950">Logout</button></form>
-                </div>
-            </header>
+<body class="operations-surface min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-[#18181b] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
+    <div class="operations-shell">
+        @include('admin.sidebar')
+        <main class="operations-main">
+            <header class="operations-page-head"><div><p class="operations-eyebrow">Operations</p><h1>Incident queue</h1><p>Update report status and priority, and message the reporter.</p></div><div class="operations-head-actions">@include('components.theme-toggle', ['placement' => 'inline', 'iconOnly' => true])</div></header>
 
             @if (session('status'))
                 <p class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200" role="status">{{ session('status') }}</p>
@@ -113,90 +102,6 @@
         </main>
     </div>
 
-    <script>
-        (() => {
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-            document.querySelectorAll('[data-admin-thread]').forEach((thread) => {
-                const list = thread.querySelector('[data-message-list]');
-                const empty = thread.querySelector('[data-message-empty]');
-                const alertBox = thread.querySelector('[data-message-alert]');
-                const form = thread.querySelector('[data-message-form]');
-                const button = form.querySelector('button[type="submit"]');
 
-                const renderMessages = (messages) => {
-                    list.replaceChildren();
-                    for (const message of messages) {
-                        const item = document.createElement('li');
-                        item.className = 'rounded-2xl bg-slate-50 p-3 text-sm dark:bg-slate-800';
-                        const sender = document.createElement('p');
-                        sender.className = 'font-bold text-slate-700 dark:text-slate-200';
-                        sender.textContent = message.sender_type === 'staff' ? 'MDRRMO staff' : 'Reporter';
-                        const body = document.createElement('p');
-                        body.className = 'mt-1 whitespace-pre-wrap text-slate-600 dark:text-slate-300';
-                        body.textContent = message.body;
-                        item.append(sender, body);
-                        list.appendChild(item);
-                    }
-                    empty.classList.toggle('hidden', messages.length > 0);
-                };
-
-                const loadMessages = async () => {
-                    const response = await fetch(thread.dataset.indexUrl, { headers: { Accept: 'application/json' } });
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.error || 'Unable to load the message thread.');
-                    renderMessages(data.messages || []);
-                    if (data.thread_closed) {
-                        form.classList.add('hidden');
-                        alertBox.textContent = 'This thread is closed.';
-                        alertBox.classList.remove('hidden');
-                    }
-                };
-
-                if (thread.dataset.closed === 'true') {
-                    form.classList.add('hidden');
-                    alertBox.textContent = 'This thread is closed.';
-                    alertBox.classList.remove('hidden');
-                }
-
-                thread.addEventListener('toggle', () => {
-                    if (thread.open) loadMessages().catch((error) => {
-                        alertBox.textContent = error.message;
-                        alertBox.classList.remove('hidden');
-                    });
-                });
-
-                form.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    alertBox.classList.add('hidden');
-                    button.disabled = true;
-                    const formData = new FormData(form);
-                    try {
-                        const response = await fetch(thread.dataset.storeUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf },
-                            body: JSON.stringify({ body: formData.get('body'), close_thread: formData.has('close_thread') }),
-                        });
-                        const data = await response.json();
-                        if (!response.ok) throw new Error(data.error || Object.values(data.errors || {}).flat().join(' ') || 'Unable to send the message.');
-                        form.reset();
-                        if (data.thread_closed) {
-                            form.classList.add('hidden');
-                            thread.dataset.closed = 'true';
-                        }
-                        await loadMessages();
-                    } catch (error) {
-                        alertBox.textContent = error.message || 'Unable to send the message.';
-                        alertBox.classList.remove('hidden');
-                    } finally {
-                        button.disabled = false;
-                    }
-                });
-
-                window.setInterval(() => {
-                    if (thread.open && !document.hidden) loadMessages().catch(() => {});
-                }, 30000);
-            });
-        })();
-    </script>
 </body>
 </html>

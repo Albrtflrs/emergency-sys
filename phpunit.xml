@@ -24,6 +24,7 @@
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_PORT" value="3307"/>
         <env name="DB_DATABASE" value="emergency_sys_test"/>
         <env name="DB_URL" value=""/>
         <env name="DB_USERNAME" value="mdrrmo_migrate"/>

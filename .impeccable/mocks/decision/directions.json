@@ -1,0 +1,123 @@
+{
+  "title": "Choose the visual world",
+  "question": "Which visual system should carry the redesign across resident, staff, and admin screens?",
+  "options": [
+    {
+      "id": "civic-field-guide",
+      "kind": "assigned",
+      "label": "Civic Field Guide",
+      "kicker": "THE ROLL",
+      "lineage": "Philippine municipal public-service wayfinding",
+      "thesis": "Emergency reporting as a clear civic service, organized by reliable signs and unmistakable next steps.",
+      "palette": ["#173f43", "#e8eee8", "#f2c14e", "#c84c3a"],
+      "materials": ["painted wayfinding panels", "printed civic notices"],
+      "viewport": "A calm, light report-intake screen with a dark teal service masthead, a clearly separated hotline notice, and a crisp form beside a compact step rail. Standard controls stay recognizable; amber and red are reserved for meaningful states.",
+      "risk": "Can feel institutional if the typography and spacing become too rigid.",
+      "raised": [
+        {"from": "Exposure record", "raise": "Status and priority always pair color with clear text and tonal contrast, so meaning survives grayscale and color-vision differences."},
+        {"from": "Vertical feed", "raise": "Each reporting step stays focused, with the next useful action visible without competing for attention."},
+        {"from": "Labanotation", "raise": "The tracking history keeps time and sequence explicit; progress never implies dispatch."},
+        {"from": "Reference manual", "raise": "Optional details stay progressively disclosed, while essential reporting fields remain in the primary flow."},
+        {"from": "Product marketing", "raise": "Summary figures and status claims stay attached to the real report data and its context."}
+      ],
+      "html": ".impeccable/mocks/decision/civic-field-guide.html",
+      "htmlFrame": "1440x900"
+    },
+    {
+      "id": "transit-status-atlas",
+      "kind": "challenger",
+      "catalogId": "wayfinding-cartography-signage-midnight-transit-diagram",
+      "label": "Status Atlas",
+      "verdict": "competitive",
+      "lineage": "Metropolitan rail wayfinding diagrams",
+      "thesis": "Tracking as a legible sequence of named status stations, with the current state unmistakably marked.",
+      "palette": ["#142c3c", "#f5f2e9", "#e6503a", "#36a6a0", "#e8b94f"],
+      "materials": ["enamel route lines", "porcelain station markers"],
+      "viewport": "A familiar tracking page leads with the reference and current status, then shows the dated status history as a route-like timeline. It represents report progress only, never geographic routing or dispatch.",
+      "case": "Strong status legibility and a memorable timeline; weaker fit for the report-entry form and risk of suggesting physical routing.",
+      "risk": "The route metaphor must never imply that responders have been dispatched.",
+      "html": ".impeccable/mocks/decision/transit-status-atlas.html",
+      "htmlFrame": "1440x900"
+    },
+    {
+      "id": "exposure-record",
+      "kind": "challenger",
+      "catalogId": "operate-b-exposure-record-zone-sheets",
+      "label": "Exposure Record",
+      "verdict": "declined",
+      "lineage": "Darkroom exposure records",
+      "palette": ["#202528", "#e4e6e3", "#c72f8b"],
+      "materials": ["translucent sheets", "tonal exposure scale"],
+      "case": "The photography-specific notation does not map cleanly to residents reporting emergencies.",
+      "kept": "Strong tonal separation for severity and focus states.",
+      "hero": "https://impeccable.style/worlds/cards/operate-b-exposure-record-zone-sheets-hero.webp"
+    },
+    {
+      "id": "vertical-feed",
+      "kind": "challenger",
+      "catalogId": "pop-culture-shelf-vertical-video-feed-surface",
+      "label": "Vertical Feed",
+      "verdict": "declined",
+      "lineage": "Full-screen short-form media feeds",
+      "palette": ["#111111", "#ffffff"],
+      "materials": ["full-bleed media", "snap paging"],
+      "case": "A media-first, swipe-driven surface hides the structure and calm needed for urgent reporting.",
+      "kept": "One focused task at a time.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-vertical-video-feed-surface-hero.webp"
+    },
+    {
+      "id": "labanotation",
+      "kind": "challenger",
+      "catalogId": "notation-diagram-systems-labanotation",
+      "label": "Movement Score",
+      "verdict": "declined",
+      "lineage": "Labanotation movement scores",
+      "palette": ["#ffffff", "#161616", "#d8dcdf"],
+      "materials": ["symbol blocks", "vertical staff"],
+      "case": "Its specialist notation is unfamiliar and would make status comprehension harder.",
+      "kept": "Chronology should read as a clear sequence with timestamps.",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-labanotation-hero.webp"
+    },
+    {
+      "id": "acetate-manual",
+      "kind": "challenger",
+      "catalogId": "rw-manual-acetate-tab-board",
+      "label": "Tabbed Field Manual",
+      "verdict": "declined",
+      "lineage": "Tabbed boxed-software reference manuals",
+      "palette": ["#e2b83f", "#e9eee8", "#183f43", "#bb4437"],
+      "materials": ["colored section boards", "clear acetate leaves"],
+      "case": "Layered leaves and bespoke tab behavior add a second interface grammar to a task that needs direct controls.",
+      "kept": "Optional information should be progressively disclosed without hiding essentials.",
+      "hero": "https://impeccable.style/worlds/cards/rw-manual-acetate-tab-board-hero.webp"
+    },
+    {
+      "id": "monochrome-marketing",
+      "kind": "challenger",
+      "catalogId": "digital-design-canon-monochrome-product-marketing",
+      "label": "Proof-First Minimal",
+      "verdict": "declined",
+      "lineage": "Monochrome software product pages",
+      "palette": ["#f8f9f8", "#171b1b", "#167b72"],
+      "materials": ["neutral scale", "paired data and explanation"],
+      "case": "Marketing-style proof sections do not carry the full reporting and operations workflow.",
+      "kept": "Keep operational summaries grounded in real data and context.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-monochrome-product-marketing-hero.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code"},
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "The category standard",
+    "thesis": "A conventional, clean civic service interface, executed with care and without a distinctive material world.",
+    "palette": ["#ffffff", "#15202b", "#1d4ed8"],
+    "materials": ["clean grid", "standard form controls"],
+    "viewport": "A standard two-column public report form with a simple header, plain progress bar, and familiar primary action.",
+    "risk": "Clear and familiar, but less recognizably local and easier to confuse with other service portals.",
+    "html": ".impeccable/mocks/decision/category-standard.html",
+    "htmlFrame": "1440x900"
+  },
+  "steer": true
+}

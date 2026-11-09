@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff dashboard</title>
     @vite('resources/css/app.css')
-    <script>document.documentElement.classList.toggle('dark', localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);</script>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased transition-colors duration-200 dark:bg-[#111315] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
+<body class="operations-surface min-h-screen bg-slate-50 text-slate-800 antialiased transition-colors duration-200 dark:bg-[#18181b] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
     <div class="app-photo-canvas min-h-screen">
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <header class="mb-7 flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 text-slate-900 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-900 dark:text-white">
-            <div><p class="text-xs font-black uppercase tracking-[0.24em] text-blue-800 dark:text-blue-300">MDRRMO · Staff portal</p><h1 class="mt-2 text-3xl font-black tracking-tight">Emergency reports queue</h1></div>
+        <header class="civic-masthead mb-7 flex flex-col gap-4 rounded-[6px] p-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800 dark:bg-slate-900 dark:text-white">
+            <div>@include('components.brand-marks')<p class="text-xs font-black uppercase tracking-[0.18em] text-blue-800 dark:text-blue-300">Kalibo MDRRMO · SOU · Staff operations</p><h1 class="mt-2 text-3xl font-black tracking-tight">Emergency reports queue</h1></div>
             <div class="flex items-center gap-3">
                 @include('components.theme-toggle', ['placement' => 'inline'])
                 <form method="POST" action="{{ route('staff.logout') }}">@csrf<button type="submit" class="rounded-full bg-blue-800 px-5 py-2.5 text-sm font-black text-white hover:bg-blue-900 dark:bg-blue-400 dark:text-slate-950 dark:hover:bg-blue-300">Logout</button></form>
@@ -20,7 +19,7 @@
         <p id="queue-poll-status" class="mb-4 text-sm text-slate-500 dark:text-slate-400" aria-live="polite">Live queue updates are connecting.</p>
         <ul class="space-y-3">
         @forelse ($reports as $report)
-            <li class="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:bg-slate-900">
+            <li class="civic-panel flex flex-col gap-4 rounded-[6px] p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:bg-slate-900">
                 <div><p class="text-xs font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Report reference</p><p class="mt-1 font-mono text-lg font-black text-slate-900 dark:text-white">{{ $report->reference_code }}</p>
                     @if ($report->photo_path)
                         <a href="{{ route('staff.report.photo', $report) }}" target="_blank" rel="noreferrer" class="mt-3 inline-flex items-center gap-3 text-sm font-bold text-blue-800 hover:underline dark:text-blue-300"><img src="{{ route('staff.report.photo', $report) }}" alt="Submitted incident photo" class="h-14 w-14 rounded-xl object-cover">View submitted photo</a>
@@ -62,88 +61,7 @@
         @endforelse
         </ul>
     </main>
-    <script>
-        (() => {
-            const csrf = document.querySelector('input[name="_token"]')?.value;
-            const pollStatus = document.getElementById('queue-poll-status');
-            const poll = async () => {
-                try {
-                    const response = await fetch(@json(route('staff.dashboard.poll')), { headers: { Accept: 'application/json' } });
-                    if (!response.ok) throw new Error();
-                    const data = await response.json();
-                    pollStatus.textContent = `Updated ${new Date(data.updated_at).toLocaleTimeString()} · ${data.new_reports} recent reports · ${data.new_messages} recent messages`;
-                } catch {
-                    pollStatus.textContent = 'Live queue updates are unavailable. Refresh to see the latest reports.';
-                }
-            };
-            poll();
-            window.setInterval(poll, 30000);
 
-            const renderMessages = (list, empty, messages) => {
-                list.replaceChildren();
-                for (const message of messages) {
-                    const item = document.createElement('li');
-                    item.className = 'rounded-2xl bg-slate-50 p-3 text-sm dark:bg-slate-800';
-                    const sender = document.createElement('p');
-                    sender.className = 'font-bold text-slate-700 dark:text-slate-200';
-                    sender.textContent = message.sender_type === 'staff' ? 'Staff reply' : 'Reporter';
-                    const body = document.createElement('p');
-                    body.className = 'mt-1 whitespace-pre-wrap text-slate-600 dark:text-slate-300';
-                    body.textContent = message.body;
-                    item.append(sender, body);
-                    list.appendChild(item);
-                }
-                empty.classList.toggle('hidden', messages.length > 0);
-            };
-
-            document.querySelectorAll('[data-staff-thread]').forEach((thread) => {
-                const list = thread.querySelector('[data-staff-message-list]');
-                const empty = thread.querySelector('[data-staff-message-empty]');
-                const alertBox = thread.querySelector('[data-staff-message-alert]');
-                const form = thread.querySelector('[data-staff-message-form]');
-                const button = form.querySelector('button');
-                const getMessages = async () => {
-                    const response = await fetch(thread.dataset.indexUrl, { headers: { Accept: 'application/json' } });
-                    const data = await response.json();
-                    if (!response.ok) throw new Error(data.error || 'Unable to load the thread.');
-                    renderMessages(list, empty, data.messages || []);
-                    if (data.thread_closed) {
-                        form.classList.add('hidden');
-                        alertBox.textContent = 'This thread is closed.';
-                        alertBox.classList.remove('hidden');
-                    }
-                };
-                thread.addEventListener('toggle', () => {
-                    if (thread.open) getMessages().catch((error) => {
-                        alertBox.textContent = error.message;
-                        alertBox.classList.remove('hidden');
-                    });
-                });
-                form.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    alertBox.classList.add('hidden');
-                    button.disabled = true;
-                    try {
-                        const formData = new FormData(form);
-                        const response = await fetch(thread.dataset.storeUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrf },
-                            body: JSON.stringify({ body: formData.get('body'), close_thread: formData.has('close_thread') }),
-                        });
-                        const data = await response.json();
-                        if (!response.ok) throw new Error(data.error || Object.values(data.errors || {}).flat().join(' ') || 'Unable to send the reply.');
-                        form.reset();
-                        await getMessages();
-                    } catch (error) {
-                        alertBox.textContent = error.message || 'Unable to send the reply.';
-                        alertBox.classList.remove('hidden');
-                    } finally {
-                        button.disabled = false;
-                    }
-                });
-            });
-        })();
-    </script>
     </div>
 </body>
 </html>

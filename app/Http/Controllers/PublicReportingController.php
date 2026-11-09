@@ -9,13 +9,29 @@ use App\Support\I18n\LocaleCatalog;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class PublicReportingController extends Controller
 {
+    public function create(LocaleCatalog $locales): View
+    {
+        $locale = app()->getLocale();
+        $categories = IncidentCategory::query()
+            ->active()
+            ->get()
+            ->map(fn (IncidentCategory $category) => [
+                'id' => $category->id,
+                'name' => $category->nameFor($locale, 'en'),
+            ]);
+
+        return view('public.report', compact('categories'));
+    }
+
     public function categories(Request $request, LocaleCatalog $locales): JsonResponse
     {
         $requestedLocale = (string) $request->query('locale', app()->getLocale());
@@ -188,5 +204,13 @@ class PublicReportingController extends Controller
             'status' => $report->status,
             'expires_at' => $report->expires_at?->toISOString(),
         ];
+    }
+
+    public function storeFromForm(Request $request): RedirectResponse
+    {
+        $response = $this->store($request, app(LocaleCatalog::class));
+        $payload = $response->getData(true);
+
+        return redirect()->to($payload['tracking_url']);
     }
 }

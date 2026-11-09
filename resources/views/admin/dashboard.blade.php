@@ -3,87 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Operations dashboard · Kalibo MDRRMO</title>
     @vite('resources/css/app.css')
-    <script>document.documentElement.classList.toggle('dark', localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches);</script>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 antialiased transition-colors duration-200 dark:bg-[#111315] dark:text-slate-100" style="background-image:url('{{ asset('assets/lgu kalibo.jpg') }}');background-size:cover;background-position:center;background-attachment:fixed">
-    <div class="app-photo-canvas min-h-screen">
-    <div class="mx-auto max-w-7xl px-6 py-8">
-        <header class="mb-8 flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 text-slate-900 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900 dark:text-white">
-            <div>
-                <p class="text-xs font-black uppercase tracking-[0.25em] text-blue-800 dark:text-blue-300">Admin panel</p>
-                <h1 class="mt-2 text-3xl font-black tracking-tight">Operations dashboard</h1>
-            </div>
-            <div class="flex items-center gap-3">
-                @include('components.theme-toggle', ['placement' => 'inline'])
-                <a href="{{ route('admin.dashboard.queue') }}" class="rounded-full border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 hover:border-blue-700 hover:text-blue-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">Queue</a>
-                <form method="POST" action="{{ route('admin.logout') }}">
-                    @csrf
-                    <button type="submit" class="rounded-full bg-blue-800 px-4 py-2 text-sm font-black text-white hover:bg-blue-900 dark:bg-blue-400 dark:text-slate-950 dark:hover:bg-blue-300">Logout</button>
-                </form>
-            </div>
-        </header>
+<body class="operations-surface min-h-screen text-slate-800 antialiased dark:text-slate-100">
+    <div class="operations-shell">
+        @include('admin.sidebar')
+        <main class="operations-main">
+            <header class="operations-page-head">
+                <div><p class="operations-eyebrow">Operations overview</p><h1>Dashboard</h1><p>Incident activity and response status at a glance.</p></div>
+                <div class="operations-head-actions">@include('components.theme-toggle', ['placement' => 'inline', 'iconOnly' => true])<a href="{{ route('admin.news.index') }}" class="operations-head-link">News &amp; advisories</a></div>
+            </header>
 
-        <section class="grid gap-5 md:grid-cols-4">
-            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Total reports</p>
-                <p class="mt-3 text-4xl font-black tracking-tight text-slate-900 dark:text-white">{{ $summary['total'] }}</p>
-            </div>
-            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Open</p>
-                <p class="mt-3 text-4xl font-black tracking-tight text-amber-700 dark:text-amber-300">{{ $summary['open'] }}</p>
-            </div>
-            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Resolved</p>
-                <p class="mt-3 text-4xl font-black tracking-tight text-emerald-700 dark:text-emerald-300">{{ $summary['resolved'] }}</p>
-            </div>
-            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Critical</p>
-                <p class="mt-3 text-4xl font-black tracking-tight text-blue-800 dark:text-blue-300">{{ $summary['critical'] }}</p>
-            </div>
-        </section>
+            <section class="operations-stat-grid" aria-label="Incident report totals">
+                <article class="operations-stat"><span>Total reports</span><strong>{{ number_format($summary['total']) }}</strong><small>All recorded reports</small></article>
+                <article class="operations-stat"><span>Open reports</span><strong>{{ number_format($summary['open']) }}</strong><small>Submitted or in progress</small></article>
+                <article class="operations-stat"><span>Resolved</span><strong>{{ number_format($summary['resolved']) }}</strong><small>Marked resolved</small></article>
+                <article class="operations-stat operations-stat-critical"><span>Critical priority</span><strong>{{ number_format($summary['critical']) }}</strong><small>Requires close attention</small></article>
+            </section>
 
-        <section class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <div class="mb-6 flex items-center justify-between">
-                <h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white">Recent incidents</h2>
-                <span class="text-sm text-slate-500 dark:text-slate-400">Latest 12 entries</span>
-            </div>
+            <section class="operations-graph-grid" aria-label="Incident statistics">
+                <article class="operations-chart-panel">
+                    <div class="operations-chart-heading"><div><h2>Reports submitted · last 7 days</h2><p>Count by submission date</p></div><strong>{{ number_format($reportTrend->sum('count')) }}<small> total</small></strong></div>
+                    <div class="operations-bar-chart" role="img" aria-label="Daily submitted incident reports over the last seven days">
+                        @foreach ($reportTrend as $day)
+                            <div class="operations-bar-column" title="{{ \Illuminate\Support\Carbon::parse($day['date'])->format('F j') }}: {{ $day['count'] }} reports">
+                                <span class="operations-bar-value">{{ $day['count'] }}</span>
+                                <div class="operations-bar-track"><span class="operations-bar" style="height: {{ $day['height'] }}%"></span></div>
+                                <span class="operations-bar-label">{{ $day['label'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </article>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 text-left text-sm dark:divide-slate-700">
-                    <thead class="bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                        <tr>
-                            <th class="px-4 py-3 font-semibold">Incident</th>
-                            <th class="px-4 py-3 font-semibold">Location</th>
-                            <th class="px-4 py-3 font-semibold">Status</th>
-                            <th class="px-4 py-3 font-semibold">Priority</th>
-                            <th class="px-4 py-3 font-semibold">Created</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                        @forelse ($reports as $report)
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/70">
-                                <td class="px-4 py-3 font-medium text-slate-800 dark:text-slate-100">{{ $report->category?->nameFor(app()->getLocale(), 'en') ?? 'Incident' }}<span class="mt-1 block font-mono text-xs text-slate-500 dark:text-slate-400">{{ $report->reference_code }}</span></td>
-                                <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ $report->location_text ?: 'Not provided' }}</td>
-                                <td class="px-4 py-3">
-                                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">{{ ucfirst($report->status ?? 'open') }}</span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/15 dark:text-amber-300">{{ ucfirst($report->priority) }}</span>
-                                </td>
-                                <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ $report->created_at?->format('M d, Y H:i') ?? '—' }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">No incidents recorded yet.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </div>
-    </div>
-</body>
-</html>
+                <article class="operations-chart-panel">
+                    <div class="operations-chart-heading"><div><h2>Report status breakdown</h2><p>Current records by workflow state</p></div></div>
+                    @php($statusTotal = max(1, (int) $statusCounts->sum()))
+                    <div class="operations-status-chart">
+                        @foreach (['submitted' => 'Submitted', 'in_progress' => 'In progress', 'queued' => 'Queued', 'resolved' => 'Resolved', 'closed' => 'Closed'] as $key => $label)
+                            @php($count = (int) ($statusCounts[$key] ?? 0))
+                            <div class="operations-status-row"><div class="operations-status-label"><span>{{ $label }}</span><strong>{{ $count }}</strong></div><div class="operations-status-track" role="img" aria-label="{{ $label }}: {{ $count }} reports"><span style="width: {{ round($count / $statusTotal * 100) }}%"></span></div></div>
+                        @endforeach
+                    </div>
+                </article>
+            </section>
+
+            <section class="operations-table-panel" aria-labelledby="recent-reports-heading">
+                <div class="operations-table-heading"><div><h2 id="recent-reports-heading">Recent reports</h2><p>Latest 12 incident records</p></div><a href="{{ route('admin.dashboard.queue') }}">Open incident queue <span aria-hidden="true">→</span></a></div>
+                <div class="overflow-x-auto"><table class="operations-table"><thead><tr><th>Incident</th><th>Location</th><th>Status</th><th>Priority</th><th>Received</th></tr></thead><tbody>
+                    @forelse ($reports as $report)
+                        <tr><td><strong>{{ $report->category?->nameFor(app()->getLocale(), 'en') ?? 'Incident' }}</strong><small>{{ $report->reference_code }}</small></td><td>{{ $report->location_text ?: 'Not provided' }}</td><td><span class="operations-state operations-state-{{ $report->status }}">{{ ucfirst(str_replace('_', ' ', $report->status ?? 'open')) }}</span></td><td><span class="operations-priority operations-priority-{{ $report->priority }}">{{ ucfirst($report->priority) }}</span></td><td>{{ $report->submitted_at?->format('M j, Y H:i') ?? '—' }}</td></tr>
+                    @empty
++                        <tr><td colspan="5" class="operations-empty-row">No incident reports recorded yet.</td></tr>
++                    @endforelse
++                </tbody></table></div>
++            </section>
++        </main>
++    </div>
++</body>
++</html>

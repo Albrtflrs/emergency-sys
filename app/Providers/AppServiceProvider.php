@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\NewsPost;
 use App\Services\Audit\AuditWriter;
 use App\Support\I18n\LocaleCatalog;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,14 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer(['landing', 'public.*', 'tracking.*'], function ($view): void {
             $view->with('availableLocales', app(LocaleCatalog::class)->all());
+        });
+
+        View::composer('public.footer', function ($view): void {
+            $view->with('footerNews', NewsPost::query()
+                ->visibleToPublic()
+                ->orderByDesc('published_at')
+                ->limit(3)
+                ->get(['title', 'slug', 'category', 'published_at']));
         });
     }
 }
