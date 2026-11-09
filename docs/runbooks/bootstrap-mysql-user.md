@@ -5,6 +5,13 @@ grant matrix that enforces audit-log immutability.
 
 Run every statement as a MySQL superuser (root), except where noted.
 
+This procedure describes the production-like MySQL 8 setup and its `mdrrmo`
+and `mdrrmo_test` schemas. The current local Windows installation is MariaDB
+10.4 on port 3307 and instead uses `emergency_sys` and `emergency_sys_test`;
+its service accounts are provisioned locally using the same least-privilege
+matrix. Do not treat the local MariaDB setup as satisfying the MySQL 8
+production requirement.
+
 ---
 
 ## 1. Confirm MySQL 8 and server defaults

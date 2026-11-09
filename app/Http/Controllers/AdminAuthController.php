@@ -31,15 +31,15 @@ class AdminAuthController extends Controller
             ]);
         }
 
-        if (($user->role ?? 'staff') !== 'admin') {
+        if (! in_array($user->role ?? 'staff', ['admin', 'mdrrmo_officer', 'information_officer'], true)) {
             throw ValidationException::withMessages([
-                'email' => ['This account does not have administrator access.'],
+                'email' => ['This account does not have MDRRMO publishing access.'],
             ]);
         }
 
         $request->session()->regenerate();
 
-        return redirect()->route('admin.dashboard');
+        return redirect()->route($user->role === 'admin' ? 'admin.dashboard' : 'admin.news.index');
     }
 
     public function logout(Request $request): RedirectResponse

@@ -7,6 +7,7 @@ use App\Logging\RedactSensitiveData;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(EnsureCorrelationId::class);
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('admin/*')
+            ? route('admin.login')
+            : route('staff.login'));
         $middleware->alias([
             'turnstile' => VerifyTurnstile::class,
             'role' => EnsureUserRole::class,

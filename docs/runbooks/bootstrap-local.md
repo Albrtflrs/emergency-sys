@@ -7,7 +7,7 @@ Fresh clone to running app, on a new machine.
 - PHP 8.2 or higher with pdo_mysql
 - Composer
 - Node.js 20 LTS or higher
-- MySQL 8.0 or higher running on 127.0.0.1:3306
+- MySQL 8.0 or higher running on 127.0.0.1:3306 for production-like setup
 
 ## 1. Clone and install
 
@@ -20,20 +20,37 @@ Fresh clone to running app, on a new machine.
 
 ## 2. Bootstrap MySQL
 
-Follow `docs/runbooks/bootstrap-mysql-users.md`. That creates both schemas
-(mdrrmo, mdrrmo_test) and all three users with the grant matrix.
+Follow `docs/runbooks/bootstrap-mysql-user.md`. That creates both schemas
+(`mdrrmo`, `mdrrmo_test`) and all three users with the grant matrix.
 
-## 3. Fill in .env
+For this Windows development machine, the configured local server is MariaDB
+10.4 on port 3307 and uses `emergency_sys` / `emergency_sys_test`. The local
+service accounts and grants have been provisioned on that instance. This local
+setup is not production-compliant; production must use the MySQL 8 runbook
+requirements and separate production passwords.
 
-Set DB_PASSWORD, DB_AUDIT_PASSWORD, DB_MIGRATE_PASSWORD to the values you
-used in step 2. Leave DB_HOST, DB_DATABASE, DB_USERNAME, DB_PORT at their
-defaults unless you changed them.
+## 3. Configure local environments
+
+For a fresh MySQL 8 setup, set `DB_HOST`, `DB_PORT`, `DB_DATABASE`,
+`DB_USERNAME`, `DB_PASSWORD`, `DB_AUDIT_USERNAME`, `DB_AUDIT_PASSWORD`,
+`DB_MIGRATE_USERNAME`, and `DB_MIGRATE_PASSWORD` to match the runbook.
+
+On the current Windows development machine, local MariaDB is on port 3307:
+
+- `.env`: `emergency_sys`, runtime user `mdrrmo_app`
+- `.env.testing`: `emergency_sys_test`, runtime user `mdrrmo_app`
+- Both files set the audit and migration usernames and local passwords.
+
+Do not copy local credentials into production. Set distinct production secrets
+and rotate the local example credentials before deployment.
 
 ## 4. Run migrations
 
-Migrations run as the migrate user, not the app user:
+Migrations run as the migrate user, not the app user. The normal command uses
+the active `.env` schema; for testing, use the isolated test environment:
 
     php artisan migrate --database=mysql_migrate --seed
+    php artisan migrate --env=testing --database=mysql_migrate --force
 
 ## 5. Verify connections
 
@@ -54,7 +71,8 @@ Then visit http://localhost:8000.
 
     php artisan test
 
-Tests use mdrrmo_test. They will fail if the grants from step 2 are missing,
+Tests use `emergency_sys_test` on port 3307 in this local setup. They will fail
+if the grants from step 2 are missing,
 which is intentional.
 
 ## Troubleshooting
